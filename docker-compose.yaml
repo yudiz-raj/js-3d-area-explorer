@@ -1,0 +1,21 @@
+---
+services:
+  demo:
+    build:
+      context: ./
+      dockerfile: ./demo/Dockerfile
+      args:
+        - API_KEY=
+
+    ports:
+      - "5500:8080"
+
+  app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      args:
+        - API_KEY=
+
+    ports:
+      - "5500:8080"
