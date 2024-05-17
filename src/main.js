@@ -51,6 +51,6 @@ export async function main() {
   } catch (error) {
     console.error(error);
   }
-}
 
+}
 main();

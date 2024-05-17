@@ -101,8 +101,32 @@ export async function updateSidebarElements(placeId) {
   addCloseButtonListener();
 
   // get all place details to be displayed in the sidebar
-  const placeDetails = await getPlaceDetails(placeId);
+  let placeDetails = null;
+  if (placeId == "center") {
 
+    placeDetails = {
+      name: "Home",
+      rating: 4.5,
+      user_ratings_total: 69,
+      types: ['restaurant'],
+      vicinity: "Madliena, Malta",
+      address_components: [
+        { long_name: "Home", short_name: "Home" },
+        { long_name: "Madliena", short_name: "Madliena" },
+        { long_name: "Malta", short_name: "MT" }
+      ],
+      adr_address: '<span class="street-address">Home</span>, <span class="locality">Madliena</span>, <span class="country-name">Malta</span>',
+      business_status: 'OPERATIONAL',
+      current_opening_hours: { /* opening hours data */ },
+      formatted_address: 'Home, Madliena, Malta',
+      formatted_phone_number: '123456789',
+      types: ['restaurant', 'food', 'point_of_interest', 'establishment'],
+      reviews: []
+    };
+  }
+  else {
+    placeDetails = await getPlaceDetails(placeId);
+  }
   updatePlaceHeader(placeDetails);
   updatePlaceOverview(placeDetails);
   updatePlaceReviews(placeDetails.reviews);

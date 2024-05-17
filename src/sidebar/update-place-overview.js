@@ -23,6 +23,7 @@
  */
 export const updatePlaceOverview = (placeDetails) => {
   const placeOverviewElement = document.querySelector(".place-overview");
+  console.log(placeOverviewElement);
   if (!placeOverviewElement) {
     return;
   }

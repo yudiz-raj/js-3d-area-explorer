@@ -16,7 +16,7 @@
 import { GOOGLE_MAPS_API_KEY } from "../../env.js";
 
 // Camera height above the target when flying to a point.
-const CAMERA_HEIGHT = 100;
+const CAMERA_HEIGHT = 70;
 
 // Pitch 30 degrees downwards
 const BASE_PITCH = -30;
@@ -161,7 +161,7 @@ async function adjustCoordinateHeight(coords) {
  * @param {Function | undefined} [options.onComplete] - The function to execute when the flight is complete.
  * @param {number | undefined} [options.duration] - The duration of the fly-to animation in seconds. If undefined, Cesium calculates an ideal duration based on the distance to be traveled by the flight.
  */
-async function flyToBoundingSphere({ coords, offset, onComplete, duration }) {
+async function flyToBoundingSphere({ coords, offset, onComplete, duration, callback }) {
   flyToCoordinates = coords;
   const adjustedCoords = await adjustCoordinateHeight(coords);
 
@@ -169,7 +169,10 @@ async function flyToBoundingSphere({ coords, offset, onComplete, duration }) {
     new Cesium.BoundingSphere(adjustedCoords, 0),
     {
       offset,
-      complete: onComplete,
+      complete: () => {
+        if (onComplete) onComplete();
+        if (callback) callback();
+      },
       duration,
     }
   );
@@ -416,19 +419,19 @@ function showUIElements() {
  * @param {number | undefined} options.duration - The duration of the fly-to animation in seconds. If undefined, Cesium calculates an ideal duration based on the distance to be traveled by the flight.
  * @throws {Error} Throws an error if no coordinates are provided.
  */
+
 export async function performFlyTo(coords, options = {}) {
   if (!coords) {
     throw new Error("No coordinates to fly-to provided.");
   }
 
   try {
-    const { range = CAMERA_OFFSET.range, duration } = options;
+    const { range = CAMERA_OFFSET.range, duration, callback } = options;
 
     // Stop the auto orbit animation while performing the fly-to animation
     if (isAutoOrbitEnabled()) {
       cancelAnimationFrame(animationFrameId);
     }
-
     const completeCallback = () => {
       // Initialize the UI elements if needed
       if (!isUIInitialized) {
@@ -452,6 +455,7 @@ export async function performFlyTo(coords, options = {}) {
       offset,
       onComplete: completeCallback,
       duration,
+      callback,
     });
   } catch (error) {
     console.error(`Error performing fly to: ${error}`);

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { config } from "../main.js";
 import { updateSidebarElements, toggleSidebar } from "../sidebar/sidebar.js";
 import { cesiumViewer, performFlyTo } from "./cesium.js";
 
@@ -235,8 +236,30 @@ async function handleClickOnMarker(click, pois) {
 
   // get primitive from object
   const { primitive } = pickedObject;
+
   // check if a billboard (marker) was clicked
   // if not or if the center marker was clicked, return and do nothing
+  if (primitive.id.id === "center") {
+    const cartesian = cesiumViewer.camera.pickEllipsoid(
+      click.position,
+      cesiumViewer.scene.globe.ellipsoid
+    );
+    if (cartesian) {
+      const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+      const longitude = Cesium.Math.toDegrees(cartographic.longitude);
+      const latitude = Cesium.Math.toDegrees(cartographic.latitude);
+      console.log(latitude, longitude);
+      const range = defaultLabelVisibility.near - 550;
+      await performFlyTo(config.location.coordinates, {
+        range,
+        duration: 2,
+        callback: open360View(config.location.coordinates)
+      });
+
+      toggleSidebar("open");
+      updateSidebarElements(primitive.id.id)
+    }
+  }
   if (
     !(primitive instanceof Cesium.Billboard) ||
     primitive.id.id === CENTER_MARKER_ID
@@ -244,9 +267,11 @@ async function handleClickOnMarker(click, pois) {
     return;
   }
 
+
   const marker = primitive.id;
   const placeId = marker.id;
   const currentPoi = pois.find((poi) => poi.place_id === placeId);
+  console.log(`%c placeID`, 'color: #00ff00', placeId);
 
   // if the same marker is clicked again, set the selected marker to null and close the sidebar
   if (selectedMarkerId === placeId) {
@@ -266,7 +291,8 @@ async function handleClickOnMarker(click, pois) {
   // move the camera to the clicked marker
   await performFlyTo(currentPoi.geometry.location.toJSON(), {
     range,
-    duration: 1,
+    duration: 2,
+    callback: open360View(currentPoi.geometry.location.toJSON())
   });
 }
 async function handleClickOnMap(click) {
@@ -282,15 +308,83 @@ async function handleClickOnMap(click) {
 
     // range is the distance between the camera and the clicked position
     const range = defaultLabelVisibility.near - 350; // Adjust this value to set the desired zoom level
-
+    console.log(latitude, longitude);
     // move the camera to the clicked position
     await performFlyTo({ lat: latitude, lng: longitude }, {
       range,
-      duration: 1,
+      duration: 2,
+      callback: open360View({ lat: latitude, lng: longitude })
     });
   }
 }
+function open360View(coords) {
+  setTimeout(() => {
 
+    const { lat, lng } = coords;
+
+    // Create a container element for the Street View panorama
+    const streetViewContainer = document.createElement('div');
+    streetViewContainer.id = 'street-view-container';
+    streetViewContainer.style.position = 'absolute';
+    streetViewContainer.style.top = '0';
+    streetViewContainer.style.right = '0';
+    streetViewContainer.style.width = '100%';
+    streetViewContainer.style.height = '100%';
+    streetViewContainer.style.zIndex = '1000';
+
+    // Create a close button element
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Close';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.left = '10px';
+    closeButton.style.zIndex = '1001';
+
+    // Add event listener to the close button
+    closeButton.addEventListener('click', () => {
+      // Remove the Street View container and close button from the DOM
+      document.body.removeChild(streetViewContainer);
+      document.body.removeChild(closeButton);
+    });
+
+    // Append the container and close button to the document body
+    document.body.appendChild(streetViewContainer);
+    document.body.appendChild(closeButton);
+
+    const streetViewService = new google.maps.StreetViewService();
+    const streetViewRequest = {
+      location: new google.maps.LatLng(lat, lng),
+      radius: 50, // Adjust the radius as needed
+      source: google.maps.StreetViewSource.OUTDOOR,
+    };
+
+    streetViewService.getPanorama(streetViewRequest, (data, status) => {
+      if (status === google.maps.StreetViewStatus.OK) {
+        const panorama = new google.maps.StreetViewPanorama(streetViewContainer, {
+          pano: data.location.pano,
+          pov: {
+            heading: 0,
+            pitch: 0,
+          },
+          addressControl: false,
+          fullscreenControl: false,
+          linksControl: false,
+          panControl: false,
+          zoomControl: false,
+          showRoadLabels: false,
+          motionTracking: false,
+          motionTrackingControl: false
+        });
+      } else {
+        console.error('Street View data not found for this location.');
+        // Handle the case when Street View data is not available
+        // Remove the container and close button if no Street View data is found
+        document.body.removeChild(streetViewContainer);
+        document.body.removeChild(closeButton);
+      }
+    });
+  }, 2000);
+}
 /**
  * Adds an event handler to the viewer which is used to pick an object that is under the 2d context of the mouse/pointer.
  * @param {google.maps.places.PlaceResult[]} pois - the current pois on the map
@@ -310,11 +404,15 @@ function createMarkerClickHandler(pois) {
 
   // Basically an onClick statement
   markerClickHandler.setInputAction((click) => {
+    console.log(pois);
     handleClickOnMarker(click, pois);
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK); // This defines that we want to listen for a click event
-  markerClickHandler.setInputAction((click) => {
-    handleClickOnMap(click);
-  }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK); // This defines that we want to listen for a click event
+
+  // Add this new input action to handle double-click on the map
+  // markerClickHandler.setInputAction((click) => {
+  //   handleClickOnMap(click);
+  // }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK); // This defines that we want to listen for a double-click event
+
 }
 
 let hoveredMarker = null;

@@ -62,6 +62,7 @@ export async function getPlaceDetails(placeId) {
   return new Promise((resolve, reject) => {
     placesService.getDetails(request, (place, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
+
         resolve(place); // Resolve the promise with the 'place' value
       } else {
         reject(new Error("Failed to get place details")); // Reject the promise in case of an error
