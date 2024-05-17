@@ -248,7 +248,7 @@ async function handleClickOnMarker(click, pois) {
       const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
       const longitude = Cesium.Math.toDegrees(cartographic.longitude);
       const latitude = Cesium.Math.toDegrees(cartographic.latitude);
-      const range = defaultLabelVisibility.near - 500;
+      const range = defaultLabelVisibility.near - 400;
       await performFlyTo(config.location.coordinates, {
         range,
         duration: 2,
@@ -285,7 +285,7 @@ async function handleClickOnMarker(click, pois) {
 
   // range is the distance between the camera and the marker
   // we subtract 70 (meters) to make sure the label is visible when the camera is close to the marker
-  const range = defaultLabelVisibility.near - 500;
+  const range = defaultLabelVisibility.near - 400;
 
   // move the camera to the clicked marker
   await performFlyTo(currentPoi.geometry.location.toJSON(), {
