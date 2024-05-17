@@ -25,7 +25,7 @@ import createMarkers from "./utils/create-markers.js";
 // or request some file from another host, by changing the config url parameter.
 //
 // You could also implement your (dynamic) configuration loading function here.
-export const config = await loadConfig("config.json");
+export const config = await loadConfig("src/config.json");
 
 const {
   location: { coordinates },

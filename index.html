@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" type="text/css" href="./main.css" />
+  <link rel="stylesheet" type="text/css" href="./src/main.css" />
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAo6DIOnhYdywBidl4clsPZPkQkXfq6QhI"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/cesiumjs/1.105/Build/Cesium/Cesium.js"></script>
   <link href="https://ajax.googleapis.com/ajax/libs/cesiumjs/1.105/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
@@ -20,13 +20,13 @@
       <div class="custom-overlay overlay-is-hidden">
         <div class="zoom-control">
           <button class="zoom-control-button zoom-in-button" aria-label="Zoom in">
-            <img src="assets/icons/zoom-control-plus-icon.svg" alt="" />
+            <img src="./src/assets/icons/zoom-control-plus-icon.svg" alt="" />
           </button>
           <button class="zoom-control-button zoom-reset-button" aria-label="Reset zoom">
-            <img src="assets/icons/zoom-control-reset-icon.svg" alt="" />
+            <img src="./src/assets/icons/zoom-control-reset-icon.svg" alt="" />
           </button>
           <button class="zoom-control-button zoom-out-button" aria-label="Zoom out">
-            <img src="assets/icons/zoom-control-minus-icon.svg" alt="" />
+            <img src="./src/assets/icons/zoom-control-minus-icon.svg" alt="" />
           </button>
         </div>
         <div class="auto-orbit-control">
@@ -41,7 +41,7 @@
       <div class="cesium-attribution-container">
         rendered with
         <a class="cesium-logo__link" href="https://cesium.com/" target="_blank"><img class="cesium-logo__image"
-            src="assets/cesium-js.png" alt="CesiumJS Logo" /></a>
+            src="./src/assets/cesium-js.png" alt="CesiumJS Logo" /></a>
       </div>
     </div>
 
@@ -51,7 +51,7 @@
       <div class="sidebar-content-wrapper">
         <div class="place-image-container">
           <button class="sidebar-close-button" aria-label="Close Sidebar">
-            <img src="assets/icons/sidebar/close-icon.svg" alt="Close" />
+            <img src="./src/assets/icons/sidebar/close-icon.svg" alt="Close" />
           </button>
           <img class="place-image" />
         </div>
@@ -68,19 +68,19 @@
         </header>
         <div class="place-overview section-container">
           <div class="address">
-            <img src="assets/icons/sidebar/address-icon.svg" alt="address-icon" />
+            <img src="./src/assets/icons/sidebar/address-icon.svg" alt="address-icon" />
             <p class="with-loading-skeleton"></p>
           </div>
           <div class="website">
-            <img src="assets/icons/sidebar/website-icon.svg" alt="website-icon" />
+            <img src="./src/assets/icons/sidebar/website-icon.svg" alt="website-icon" />
             <a class="with-loading-skeleton"></a>
           </div>
           <div class="phone">
-            <img src="assets/icons/sidebar/phone-icon.svg" alt="phone-icon" />
+            <img src="./src/assets/icons/sidebar/phone-icon.svg" alt="phone-icon" />
             <p class="with-loading-skeleton"></p>
           </div>
           <div class="opening-hours">
-            <img src="assets/icons/sidebar/opening-hours-icon.svg" alt="opening-hours-icon" />
+            <img src="./src/assets/icons/sidebar/opening-hours-icon.svg" alt="opening-hours-icon" />
             <details>
               <summary class="opening-hours-summary with-loading-skeleton"></summary>
               <div class="opening-hours-details" />
@@ -99,7 +99,7 @@
   </main>
   <!-- Central script to load all javascript files
     to initialize google maps, cesium viewer and dynamically create UI Elements -->
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="./src/main.js"></script>
 </body>
 
 </html>

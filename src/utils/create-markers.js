@@ -89,7 +89,7 @@ function encodeSvgToDataUri(svgElement) {
  * @returns {Promise<string>} A promise resolving to the marker SVG's data URI.
  */
 async function createMarkerSvg(markerData) {
-  const baseSvgElement = await fetchSvgContent("assets/icons/empty-marker.svg");
+  const baseSvgElement = await fetchSvgContent("src/assets/icons/empty-marker.svg");
   const iconSvgElement = await fetchSvgContent(
     `${markerData.icon_mask_base_uri}.svg`
   );
@@ -512,7 +512,7 @@ function createCenterMarkerData(coords) {
     },
     place_id: null,
     icon_background_color: "#ea4335",
-    icon_mask_base_uri: "assets/icons/poi/center",
+    icon_mask_base_uri: "src/assets/icons/poi/center",
     isCenterLocation: true,
   };
 }

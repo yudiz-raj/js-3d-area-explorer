@@ -124,7 +124,7 @@ function createAttribution() {
 
   // Create image element for Google's logo
   const img = document.createElement("img");
-  img.src = "assets/google-attribution.png";
+  img.src = "src/assets/google-attribution.png";
   img.alt = "Google";
 
   cesiumCredits.prepend(img);
