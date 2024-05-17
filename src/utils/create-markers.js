@@ -248,12 +248,11 @@ async function handleClickOnMarker(click, pois) {
       const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
       const longitude = Cesium.Math.toDegrees(cartographic.longitude);
       const latitude = Cesium.Math.toDegrees(cartographic.latitude);
-      console.log(latitude, longitude);
-      const range = defaultLabelVisibility.near - 550;
+      const range = defaultLabelVisibility.near - 500;
       await performFlyTo(config.location.coordinates, {
         range,
         duration: 2,
-        callback: open360View(config.location.coordinates)
+        callback: showView(config.location.coordinates)
       });
 
       toggleSidebar("open");
@@ -286,13 +285,13 @@ async function handleClickOnMarker(click, pois) {
 
   // range is the distance between the camera and the marker
   // we subtract 70 (meters) to make sure the label is visible when the camera is close to the marker
-  const range = defaultLabelVisibility.near - 350;
+  const range = defaultLabelVisibility.near - 500;
 
   // move the camera to the clicked marker
   await performFlyTo(currentPoi.geometry.location.toJSON(), {
     range,
     duration: 2,
-    callback: open360View(currentPoi.geometry.location.toJSON())
+    callback: showView(currentPoi.geometry.location.toJSON())
   });
 }
 async function handleClickOnMap(click) {
@@ -307,83 +306,107 @@ async function handleClickOnMap(click) {
     const latitude = Cesium.Math.toDegrees(cartographic.latitude);
 
     // range is the distance between the camera and the clicked position
-    const range = defaultLabelVisibility.near - 350; // Adjust this value to set the desired zoom level
+    const range = defaultLabelVisibility.near - 800; // Adjust this value to set the desired zoom level
     console.log(latitude, longitude);
     // move the camera to the clicked position
     await performFlyTo({ lat: latitude, lng: longitude }, {
       range,
       duration: 2,
-      callback: open360View({ lat: latitude, lng: longitude })
+      callback: showView({ lat: latitude, lng: longitude })
     });
   }
 }
+function showView(coords) {
+  const autoOrbitControl = document.querySelector('.auto-orbit-control');
+  if (autoOrbitControl) {
+    autoOrbitControl.style.top = 'calc(var(--zoom-control-start) + 50px)';
+  }
+  const buttons = document.createElement('div');
+  buttons.id = 'buttons';
+  const frontViewButton = document.createElement('button');
+  frontViewButton.id = 'frontView-button';
+  frontViewButton.textContent = 'Front View'
+  frontViewButton.addEventListener('click', () => {
+    open360View(coords);
+  });
+
+  const topViewButton = document.createElement('button');
+  topViewButton.id = 'topView-button';
+  topViewButton.textContent = 'Top View';
+  topViewButton.addEventListener('click', () => {
+    if (document.getElementById('street-view-container')) {
+      document.body.removeChild(document.getElementById('street-view-container'));
+    }
+  });
+  buttons.appendChild(frontViewButton);
+  buttons.appendChild(topViewButton);
+  document.body.appendChild(buttons);
+
+}
 function open360View(coords) {
-  setTimeout(() => {
+  const { lat, lng } = coords;
+  // Create a container element for the Street View panorama
+  const streetViewContainer = document.createElement('div');
+  streetViewContainer.id = 'street-view-container';
+  streetViewContainer.style.position = 'absolute';
+  streetViewContainer.style.top = '0';
+  streetViewContainer.style.right = '0';
+  streetViewContainer.style.width = '100%';
+  streetViewContainer.style.height = '100%';
+  streetViewContainer.style.zIndex = '1000';
 
-    const { lat, lng } = coords;
+  // // Create a close button element
+  // const closeButton = document.createElement('button');
+  // closeButton.id = 'close-button';
+  // closeButton.textContent = 'Close';
+  // closeButton.style.position = 'absolute';
+  // closeButton.style.top = '10px';
+  // closeButton.style.left = '10px';
+  // closeButton.style.zIndex = '1001';
 
-    // Create a container element for the Street View panorama
-    const streetViewContainer = document.createElement('div');
-    streetViewContainer.id = 'street-view-container';
-    streetViewContainer.style.position = 'absolute';
-    streetViewContainer.style.top = '0';
-    streetViewContainer.style.right = '0';
-    streetViewContainer.style.width = '100%';
-    streetViewContainer.style.height = '100%';
-    streetViewContainer.style.zIndex = '1000';
+  // // Add event listener to the close button
+  // closeButton.addEventListener('click', () => {
+  //   // Remove the Street View container and close button from the DOM
+  //   document.body.removeChild(streetViewContainer);
+  //   document.body.removeChild(closeButton);
+  // });
 
-    // Create a close button element
-    const closeButton = document.createElement('button');
-    closeButton.textContent = 'Close';
-    closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
-    closeButton.style.left = '10px';
-    closeButton.style.zIndex = '1001';
+  // Append the container and close button to the document body
+  document.body.appendChild(streetViewContainer);
+  // document.body.appendChild(closeButton);
 
-    // Add event listener to the close button
-    closeButton.addEventListener('click', () => {
-      // Remove the Street View container and close button from the DOM
+  const streetViewService = new google.maps.StreetViewService();
+  const streetViewRequest = {
+    location: new google.maps.LatLng(lat, lng),
+    radius: 50, // Adjust the radius as needed
+    source: google.maps.StreetViewSource.OUTDOOR,
+  };
+
+  streetViewService.getPanorama(streetViewRequest, (data, status) => {
+    if (status === google.maps.StreetViewStatus.OK) {
+      const panorama = new google.maps.StreetViewPanorama(streetViewContainer, {
+        pano: data.location.pano,
+        pov: {
+          heading: 0,
+          pitch: 0,
+        },
+        addressControl: false,
+        fullscreenControl: false,
+        linksControl: false,
+        panControl: false,
+        zoomControl: false,
+        showRoadLabels: false,
+        motionTracking: false,
+        motionTrackingControl: false
+      });
+    } else {
+      console.error('Street View data not found for this location.');
+      // Handle the case when Street View data is not available
+      // Remove the container and close button if no Street View data is found
       document.body.removeChild(streetViewContainer);
-      document.body.removeChild(closeButton);
-    });
-
-    // Append the container and close button to the document body
-    document.body.appendChild(streetViewContainer);
-    document.body.appendChild(closeButton);
-
-    const streetViewService = new google.maps.StreetViewService();
-    const streetViewRequest = {
-      location: new google.maps.LatLng(lat, lng),
-      radius: 50, // Adjust the radius as needed
-      source: google.maps.StreetViewSource.OUTDOOR,
-    };
-
-    streetViewService.getPanorama(streetViewRequest, (data, status) => {
-      if (status === google.maps.StreetViewStatus.OK) {
-        const panorama = new google.maps.StreetViewPanorama(streetViewContainer, {
-          pano: data.location.pano,
-          pov: {
-            heading: 0,
-            pitch: 0,
-          },
-          addressControl: false,
-          fullscreenControl: false,
-          linksControl: false,
-          panControl: false,
-          zoomControl: false,
-          showRoadLabels: false,
-          motionTracking: false,
-          motionTrackingControl: false
-        });
-      } else {
-        console.error('Street View data not found for this location.');
-        // Handle the case when Street View data is not available
-        // Remove the container and close button if no Street View data is found
-        document.body.removeChild(streetViewContainer);
-        document.body.removeChild(closeButton);
-      }
-    });
-  }, 2000);
+      // document.body.removeChild(closeButton);
+    }
+  });
 }
 /**
  * Adds an event handler to the viewer which is used to pick an object that is under the 2d context of the mouse/pointer.
@@ -404,7 +427,6 @@ function createMarkerClickHandler(pois) {
 
   // Basically an onClick statement
   markerClickHandler.setInputAction((click) => {
-    console.log(pois);
     handleClickOnMarker(click, pois);
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK); // This defines that we want to listen for a click event
 

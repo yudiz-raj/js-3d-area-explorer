@@ -372,6 +372,19 @@ input[type="range"]::-moz-range-track {
   }
 }
 
+#buttons {
+  position: absolute;
+  --zoom-control-start: calc(var(--spacing-medium) + var(--spacing-extra-small));
+  top: var(--zoom-control-start);
+  left: var(--spacing-medium);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10001;
+
+}
+
 @media (max-width:767px) {
   #sidebar {
     z-index: 10002;

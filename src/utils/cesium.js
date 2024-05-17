@@ -392,7 +392,7 @@ async function initializeAutoOrbit(cameraConfig) {
   // Add event listeners to the viewer canvas to disable auto orbit
   eventTypes.forEach((eventType) =>
     cesiumViewer.canvas.addEventListener(eventType, () => {
-      stopAutoOrbitAnimation();
+      // stopAutoOrbitAnimation();
       // As we are moving a away from a selected poi / center
       // We reset the flyToCoordinates
       flyToCoordinates = null;

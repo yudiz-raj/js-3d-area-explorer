@@ -1,8 +1,10 @@
 .auto-orbit-control {
   position: absolute;
   --zoom-control-start: calc(var(--spacing-medium) + var(--spacing-extra-small));
-  top: var(--zoom-control-start);
-  right: var(--spacing-medium);
+  /* --zoom-control-start: calc(var(--spacing-medium) + var(--spacing-medium-large) + var(--spacing-large) + var(--spacing-medium)); */
+  top: 15px;
+  /* right: var(--spacing-medium); */
+  left: var(--spacing-medium);
   display: flex;
   gap: var(--spacing-medium);
   background-color: #000;
